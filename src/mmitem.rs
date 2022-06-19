@@ -1,3 +1,5 @@
+use std::u32::MIN;
+
 use crate::renderable::{Canvas, RenderItemBounds, Renderable};
 use crate::settings::RenderItemSettings;
 use femtovg::{Color, FontMetrics, Paint, Path};
@@ -21,15 +23,11 @@ impl MMItem {
 }
 
 const w: f32 = 300.0;
-const h: f32 = 100.0;
+const min_h: f32 = 100.0;
 
 impl Renderable for MMItem {
     fn render(&self, coords: (f32, f32), settings: &RenderItemSettings, canvas: &mut Canvas) {
         let (x, y) = coords;
-        let mut path = Path::new();
-        path.rounded_rect(x, y, w, h, 20.0);
-
-        canvas.fill_path(&mut path, Paint::color(self.color));
 
         let mut text_paint = Paint::color(settings.text_color);
         text_paint.set_font(&[settings.font.expect(&format!(
@@ -37,25 +35,35 @@ impl Renderable for MMItem {
             &self.text
         ))]);
         text_paint.set_font_size(settings.font_size);
+
+        // Draw the text
         let font_metrics: FontMetrics = canvas
             .measure_font(text_paint)
             .expect("Error measuring font");
 
+        let text_bounds_w = w - (2.0 * settings.margin);
+        let text_x = x + settings.margin;
+        let text_y = y - settings.margin;
         let lines = canvas
-            .break_text_vec(w, &self.text, text_paint)
+            .break_text_vec(text_bounds_w, &self.text, text_paint)
             .expect("Error while breaking text");
 
         // We're going to offset y per line of text
-        let mut y = y;
+        let mut text_y = text_y;
         for line_range in lines {
-            if let Ok(_res) = canvas.fill_text(x, y, &self.text[line_range], text_paint) {
-                y += font_metrics.height();
+            if let Ok(_res) = canvas.fill_text(text_x, text_y, &self.text[line_range], text_paint) {
+                text_y += font_metrics.height();
             }
         }
+
+        let mut container = Path::new();
+        let container_h = f32::max(min_h, text_y - y);
+        container.rounded_rect(x, y, w, container_h, settings.border_radius);
+        canvas.fill_path(&mut container, Paint::color(self.color));
     }
 
     fn bounds(&self, settings: &RenderItemSettings) -> crate::renderable::RenderItemBounds {
         // TODO Calculate bounds with text, margin and stuff.
-        RenderItemBounds { w, h }
+        RenderItemBounds { w, h: min_h }
     }
 }

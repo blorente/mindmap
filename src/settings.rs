@@ -11,12 +11,12 @@ pub struct RenderItemSettings {
 impl RenderItemSettings {
     pub fn new() -> Self {
         return RenderItemSettings {
-            margin: 10.0,
-            font_size: 18.0,
+            margin: 20.0,
+            font_size: 30.0,
             border_radius: 20.0,
             border_weight: 10.0,
             font: None,
-            text_color: Color::rgb(20, 100, 255),
+            text_color: Color::rgb(0, 0, 0),
         };
     }
 }
