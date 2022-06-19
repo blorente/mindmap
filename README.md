@@ -3,7 +3,7 @@
 - [ ] 
 - [X] Install RLS
 - [X] Render a square.
-- [ ] Render text.
+- [X] Render text.
 - [ ] Render a square that adjusts to the text size.
 
 
