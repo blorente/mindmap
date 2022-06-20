@@ -42,24 +42,27 @@ impl Renderable for MMItem {
             .expect("Error measuring font");
 
         let text_bounds_w = w - (2.0 * settings.margin);
-        let text_x = x + settings.margin;
-        let text_y = y - settings.margin;
         let lines = canvas
             .break_text_vec(text_bounds_w, &self.text, text_paint)
             .expect("Error while breaking text");
 
-        // We're going to offset y per line of text
+        let text_height = font_metrics.height() * lines.len() as f32;
+        let text_x = x + settings.margin;
+        let text_y = y + settings.margin + (font_metrics.height() / 2.0);
+
+        // Draw the box
+        let mut container = Path::new();
+        let container_h = f32::max(min_h, text_height + (settings.margin * 2.0));
+        container.rounded_rect(x, y, w, container_h, settings.border_radius);
+        canvas.fill_path(&mut container, Paint::color(self.color));
+
+        // Draw the text
         let mut text_y = text_y;
         for line_range in lines {
             if let Ok(_res) = canvas.fill_text(text_x, text_y, &self.text[line_range], text_paint) {
                 text_y += font_metrics.height();
             }
         }
-
-        let mut container = Path::new();
-        let container_h = f32::max(min_h, text_y - y);
-        container.rounded_rect(x, y, w, container_h, settings.border_radius);
-        canvas.fill_path(&mut container, Paint::color(self.color));
     }
 
     fn bounds(&self, settings: &RenderItemSettings) -> crate::renderable::RenderItemBounds {

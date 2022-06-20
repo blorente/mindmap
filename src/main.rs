@@ -4,10 +4,10 @@ use glutin::{
     window::WindowBuilder,
 };
 
+use components::MMItem;
 use femtovg::{
     renderer::OpenGl, Align, Baseline, Color, FontId, ImageFlags, ImageId, Paint, Path, Renderer,
 };
-use mmitem::MMItem;
 use rand::prelude::*;
 
 use log::{debug, info};
@@ -15,8 +15,8 @@ use renderable::Renderable;
 use settings::{RenderItemSettings, Settings};
 use simple_logger::SimpleLogger;
 
+mod components;
 mod layout;
-mod mmitem;
 mod renderable;
 mod settings;
 
