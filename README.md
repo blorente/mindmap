@@ -4,7 +4,7 @@
 - [X] Install RLS
 - [X] Render a square.
 - [X] Render text.
-- [ ] Render a square that adjusts to the text size.
+- [X] Render a square that adjusts to the text size.
 - [ ] Refactor to create "Square with text"
 
 

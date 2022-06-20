@@ -1,24 +1,27 @@
-use std::u32::MIN;
-
 use crate::renderable::{Canvas, RenderItemBounds, Renderable};
 use crate::settings::RenderItemSettings;
 use femtovg::{Color, FontMetrics, Paint, Path};
 use rand::random;
+use uuid::Uuid;
 
+pub type MMItemId = Uuid;
 pub struct MMItem {
     text: String,
     color: Color,
 }
 
 impl MMItem {
-    pub fn new(text: String) -> Self {
+    pub fn new(text: String) -> (Self, MMItemId) {
         let r = random::<u8>() % 255;
         let g = random::<u8>() % 255;
         let b = random::<u8>() % 255;
-        return MMItem {
-            text,
-            color: Color::rgba(r, g, b, 180),
-        };
+        return (
+            MMItem {
+                text,
+                color: Color::rgba(r, g, b, 180),
+            },
+            Uuid::new_v4(),
+        );
     }
 }
 

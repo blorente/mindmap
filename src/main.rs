@@ -17,9 +17,11 @@ use simple_logger::SimpleLogger;
 
 mod components;
 mod layout;
+mod mind_map;
 mod renderable;
 mod settings;
 
+use crate::mind_map::MindMap;
 use crate::renderable::Canvas;
 
 fn main() {
@@ -28,13 +30,13 @@ fn main() {
 
     // Constants/Model
     let mut settings = Settings::new();
-    let squares: Vec<Box<dyn Renderable>> = vec![
-        Box::new(MMItem::new("Hello".to_string())),
-        Box::new(MMItem::new(
-            "World thiss is a much longer stringhiss is a much longer string thiss is a much longer string".to_string(),
-        )),
-    ];
-    let layout = layout::layout_line(&squares, &settings.render_item_settings);
+    let mut map = MindMap::new();
+    map.create_node("I'm a parent".to_string(), None);
+    let parent_ref = map
+        .create_node("I'm another parent".to_string(), None)
+        .expect("Error creating another parent");
+    map.create_node("I'm a child of parent B".to_string(), Some(parent_ref));
+    let layout = layout::layout_mind_map(&map, &settings);
 
     // Glium Window
     let window_size = glutin::dpi::PhysicalSize::new(1000, 600);
@@ -105,8 +107,14 @@ fn main() {
                     Color::rgbf(0.9, 0.9, 0.9),
                 );
 
-                squares.iter().enumerate().for_each(|(idx, square)| {
-                    square.render(layout[idx], &settings.render_item_settings, &mut canvas)
+                layout.iter().for_each(|(id, coords)| {
+                    map.nodes
+                        .get(id)
+                        .expect(&format!(
+                            "Layout contains ID {}, but it's not in the map",
+                            id
+                        ))
+                        .render(coords.clone(), &settings.render_item_settings, &mut canvas);
                 });
 
                 canvas.flush();
